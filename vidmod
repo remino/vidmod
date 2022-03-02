@@ -1,0 +1,183 @@
+#!/bin/sh
+
+vidmod_main() {
+  scriptpath="` realpath "$0" `"  
+  scriptname="` basename "$scriptpath" `"
+  scriptdir="` dirname "$scriptpath" `"
+
+  [ $# -lt 2 ] && "${scriptname}_usage" && return 1
+
+  while getopts 'd:ho:' OPTION
+  do
+    case "$OPTION" in
+      d) outputdir="$OPTARG" ;;
+      o) final="$OPTARG" ;;
+      h) vidmod_usage && return ;;
+      f) ffmpeg_extra_opts="$OPTARG" ;;
+    esac
+  done
+
+  shift ` expr $OPTIND - 1 `
+
+  for input; do true; done
+
+  [ -z "$outputdir" ] && outputdir="` dirname "$input" `"
+  [ -n "$final" ] && outputdir="` mktemp -dt ".$scriptname" `"
+
+  prime="$input"
+  ffmpeg_opts="-hide_banner -loglevel panic -nostdin $ffmpeg_extra_opts"
+
+  if [ ! -f "$input" ]
+  then
+    _error "File not found: $input"
+    return 2
+  fi
+
+  echo "<= $input"
+
+  while [ $# -gt 1 ]
+  do
+    change="` echo "$1" | tr '[:upper:]' '[:lower:]' `"
+
+    case "$change" in
+      169|43|60fps|audio|butter|crossfade|loop|mono|mp4|mute|reverse|rotate90|rotate180|rotate270|slowdown|twitter)
+        output="` _add_tag "$input" "$change" `"
+        [ "$input" == "$output" ] && return
+        [ -z "$final" ] && echo "=> $output" || echo "=> $change"
+        "${scriptname}_${change}" 2>&1 > /dev/null
+        [ $? -gt 0 ] && return 3
+        input="$output"
+        ;;
+
+      *) return 4 ;;
+    esac
+
+    shift
+
+    if [ $# -lt 2 ] && [ -n "$final" ]
+    then
+      mv "$output" "$final"
+      echo "=> $final"
+      rm -fr "$outputdir"
+    fi
+  done
+}
+
+vidmod_169() {
+  ffmpeg -i "$input" $ffmpeg_opts -vf "setdar=16/9" "$output"
+}
+
+vidmod_43() {
+  ffmpeg -i "$input" $ffmpeg_opts -vf "setdar=4/3" "$output"
+}
+
+vidmod_60fps() {
+  ffmpeg -i "$input" $ffmpeg_opts -r 60 "$output"
+}
+
+vidmod_audio() {
+  ffmpeg -i "$input" $ffmpeg_opts -vn -acodec copy "$output"
+}
+
+vidmod_butter() {
+  butterflow "$input" -r 120 -audio --levels 6 -o "$output"
+}
+
+vidmod_crossfade() {
+  vidcrossfade -f 2 -o "$output" "$input"
+}
+
+vidmod_loop() {
+  tmpfile="` mktemp ".$scriptname.XXXXXX" `"
+
+  for i in 1 2
+  do
+    echo "file '$input'" >> "$tmpfile"
+  done
+
+  ffmpeg -f concat -safe 0 -i "$tmpfile" $ffmpeg_opts \
+    -c copy "$output"
+
+  rm "$tmpfile"
+}
+
+vidmod_mono() {
+  ffmpeg -i "$input" $ffmpeg_opts -ac 1 "$output"
+}
+
+vidmod_mp4() {
+  ffmpeg -i "$input" $ffmpeg_opts "$output"
+}
+
+vidmod_mute() {
+  ffmpeg -i "$input" $ffmpeg_opts -an -c copy "$output"
+}
+
+vidmod_reverse() {
+  ffmpeg -i "$input" $ffmpeg_opts \
+    -vf reverse -af areverse "$output"
+}
+
+vidmod_rotate90() {
+  ffmpeg -i "$input" $ffmpeg_opts -vf "transpose=1" "$output"
+}
+
+vidmod_rotate180() {
+  ffmpeg -i "$input" $ffmpeg_opts -vf "transpose=1,transpose=1" "$output"
+}
+
+vidmod_rotate270() {
+  ffmpeg -i "$input" $ffmpeg_opts -vf "transpose=2" "$output"
+}
+
+vidmod_slowdown() {
+  ffmpeg -i "$input" -filter:a "atempo=0.8" \
+    $ffmpeg_opts \
+    -filter:v "setpts=1.25*PTS" "$output"
+}
+
+vidmod_twitter() {
+  ffmpeg -i "$input" $ffmpeg_opts -vcodec libx264 \
+    -vf 'scale=640:trunc(ow/a/2)*2' -acodec aac -vb 1024k -minrate 1024k \
+    -maxrate 1024k -bufsize 1024k -ar 44100 -strict experimental -r 30 \
+    "$output"
+}
+
+vidmod_usage() {
+  echo "Usage: $scriptname [options] change1 [change2...] input"
+  echo
+  echo "Changes: 60fps, butter, crossfade, loop, mp4, mute, reverse, slowdown, twitter"
+  echo
+  echo "Options:"
+  echo
+  echo "  -d    Output directory. Defaults to directory of input file."
+  echo "  -o    Last output file. When specified, any intermediate file will"
+  echo "        be temporary."
+  echo "  -h    This help screen."
+  echo
+}
+
+_add_tag() {
+  inpath="$1"
+  tag="$2"
+
+  inname="` basename "$inpath" `"
+
+  innoext="` echo "$inname" | sed 's/\..*$//g' `"
+  inext="` echo "$inname" | grep -o '\..*$' `"
+
+  case "$tag" in
+    mp4) echo "$outputdir/$innoext.mp4" ;;
+    *) echo "$outputdir/$innoext-$tag$inext" ;;
+  esac
+}
+
+_echo() {
+  echo "$@"
+}
+
+_error() {
+  _echo "$@" >&2
+}
+
+vidmod_main "$@"
