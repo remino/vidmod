@@ -1,4 +1,6 @@
 #!/bin/sh
+# vidmod
+# Do rapid changes to video files using ffmpeg or other tools.
 
 vidmod_main() {
   scriptpath="` realpath "$0" `"  
@@ -145,6 +147,8 @@ vidmod_twitter() {
 
 vidmod_usage() {
   echo "Usage: $scriptname [options] change1 [change2...] input"
+  echo
+  echo "Do rapid changes to video files using ffmpeg or other tools."
   echo
   echo "Changes: 60fps, butter, crossfade, loop, mp4, mute, reverse, slowdown, twitter"
   echo
