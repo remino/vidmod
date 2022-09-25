@@ -18,9 +18,9 @@ vidmod_main() {
 			d) outputdir="$OPTARG" ;;
 			f) ffmpeg_extra_opts="$OPTARG" ;;
 			o) final="$OPTARG" ;;
-			h) vidmod_usage && return ;;
+			h) vidmod_help && return ;;
 			v) vidmod_version && return ;;
-			*) vidmod_usage && return $e_args ;;
+			*) vidmod_help && return $e_args ;;
 		esac
 	done
 
@@ -68,6 +68,27 @@ vidmod_main() {
 			rm -fr "$outputdir"
 		fi
 	done
+}
+
+vidmod_help() {
+cat << USAGE
+$scriptname $VERSION
+
+Usage: $scriptname [options] change1 [change2...] input
+
+Do rapid changes to video files using ffmpeg or other tools.
+
+Changes: 60fps, butter, crossfade, loop, mp4, mute, reverse, slowdown, twitter
+
+Options:
+
+	-d    Output directory. Defaults to directory of input file.
+	-o    Last output file. When specified, any intermediate file will
+	      be temporary.
+	-h    Show this help screen.
+	-v    Show version.
+
+USAGE
 }
 
 vidmod_169() {
@@ -161,24 +182,6 @@ vidmod_twitter() {
 		-vf 'scale=640:trunc(ow/a/2)*2' -acodec aac -vb 1024k -minrate 1024k \
 		-maxrate 1024k -bufsize 1024k -ar 44100 -strict experimental -r 30 \
 		"$output"
-}
-
-vidmod_usage() {
-	echo "$scriptname $VERSION"
-	echo
-	echo "Usage: $scriptname [options] change1 [change2...] input"
-	echo
-	echo "Do rapid changes to video files using ffmpeg or other tools."
-	echo
-	echo "Changes: 60fps, butter, crossfade, loop, mp4, mute, reverse, slowdown, twitter"
-	echo
-	echo "Options:"
-	echo
-	echo "  -d    Output directory. Defaults to directory of input file."
-	echo "  -o    Last output file. When specified, any intermediate file will"
-	echo "        be temporary."
-	echo "  -h    This help screen."
-	echo
 }
 
 vidmod_version() {
