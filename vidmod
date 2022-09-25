@@ -2,6 +2,8 @@
 # vidmod
 # Do rapid changes to video files using ffmpeg or other tools.
 
+VERSION='0.9.0'
+
 vidmod_main() {
 	scriptpath="$( realpath "$0" )"
 	scriptname="$( basename "$scriptpath" )"
@@ -10,13 +12,14 @@ vidmod_main() {
 
 	[ $# -lt 2 ] && "${scriptname}_usage" && return 1
 
-	while getopts 'd:f:ho:' OPTION
+	while getopts 'd:f:ho:v' OPTION
 	do
 		case "$OPTION" in
 			d) outputdir="$OPTARG" ;;
 			f) ffmpeg_extra_opts="$OPTARG" ;;
 			o) final="$OPTARG" ;;
 			h) vidmod_usage && return ;;
+			v) vidmod_version && return ;;
 			*) vidmod_usage && return $e_args ;;
 		esac
 	done
@@ -161,6 +164,8 @@ vidmod_twitter() {
 }
 
 vidmod_usage() {
+	echo "$scriptname $VERSION"
+	echo
 	echo "Usage: $scriptname [options] change1 [change2...] input"
 	echo
 	echo "Do rapid changes to video files using ffmpeg or other tools."
@@ -174,6 +179,10 @@ vidmod_usage() {
 	echo "        be temporary."
 	echo "  -h    This help screen."
 	echo
+}
+
+vidmod_version() {
+	echo "$scriptname $VERSION"
 }
 
 _add_tag() {
