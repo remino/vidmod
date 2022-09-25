@@ -2,7 +2,7 @@
 # vidmod
 # Do rapid changes to video files using ffmpeg or other tools.
 
-VERSION='1.0.0'
+VERSION='1.0.1'
 
 vidmod_main() {
 	scriptpath="$( realpath "$0" )"
@@ -10,7 +10,7 @@ vidmod_main() {
 
 	e_args=16
 
-	[ $# -lt 2 ] && "${scriptname}_usage" && return 1
+	[ $# -lt 2 ] && "${scriptname}_help" && return 1
 
 	while getopts 'd:f:ho:v' OPTION
 	do
