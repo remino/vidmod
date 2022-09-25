@@ -2,15 +2,13 @@
 # vidmod
 # Do rapid changes to video files using ffmpeg or other tools.
 
-VERSION='1.0.1'
+VERSION='1.0.2'
 
 vidmod_main() {
 	scriptpath="$( realpath "$0" )"
 	scriptname="$( basename "$scriptpath" )"
 
 	e_args=16
-
-	[ $# -lt 2 ] && "${scriptname}_help" && return 1
 
 	while getopts 'd:f:ho:v' OPTION
 	do
@@ -24,7 +22,9 @@ vidmod_main() {
 		esac
 	done
 
-	shift "$(( OPTIND - 1 ))"
+	[ $# -gt 0 ] && shift "$(( OPTIND - 1 ))"
+
+	[ $# -lt 2 ] && "${scriptname}_help" && return 1
 
 	for input; do true; done
 
