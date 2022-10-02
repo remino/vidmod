@@ -74,13 +74,16 @@ vidmod_help() {
 cat << USAGE
 $scriptname $VERSION
 
-Usage: $scriptname [options] change1 [change2...] input
+USAGE: $scriptname [<options>] <change1> [<changen>...] <input>
 
 Do rapid changes to video files using ffmpeg or other tools.
 
-Changes: 60fps, butter, crossfade, loop, mp4, mute, reverse, slowdown, twitter
+CHANGES:
 
-Options:
+	169, 43, 60fps, audio, butter, crossfade, loop, mono, mp4, mute,
+	reverse, rotate90, rotate180, rotate270, slowdown, twitter
+
+OPTIONS:
 
 	-d    Output directory. Defaults to directory of input file.
 	-o    Last output file. When specified, any intermediate file will
