@@ -46,7 +46,7 @@ vidmod_main() {
 		change="$( echo "$1" | tr '[:upper:]' '[:lower:]' )"
 
 		case "$change" in
-			169|43|60fps|audio|butter|crossfade|loop|mono|mp4|mute|reverse|rotate90|rotate180|rotate270|slowdown|twitter)
+			169|43|60fps|audio|butter|crop219|crossfade|loop|mono|mp4|mute|reverse|rotate90|rotate180|rotate270|slowdown|twitter)
 				output="$( _add_tag "$input" "$change" )"
 				[ "$input" = "$output" ] && return
 				[ -z "$final" ] && echo "=> $output" || echo "=> $change"
@@ -80,7 +80,7 @@ Do rapid changes to video files using ffmpeg or other tools.
 
 CHANGES:
 
-	169, 43, 60fps, audio, butter, crossfade, loop, mono, mp4, mute,
+	169, 43, 60fps, audio, butter, crop219, crossfade, loop, mono, mp4, mute,
 	reverse, rotate90, rotate180, rotate270, slowdown, twitter
 
 OPTIONS:
@@ -116,6 +116,11 @@ vidmod_audio() {
 
 vidmod_butter() {
 	butterflow "$input" -r 120 -audio --levels 6 -o "$output"
+}
+
+vidmod_crop219() {
+	# shellcheck disable=SC2086
+	ffmpeg -i "$input" $ffmpeg_opts -filter:v "crop=iw:iw/21*9" "$output"
 }
 
 vidmod_crossfade() {
