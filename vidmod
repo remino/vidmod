@@ -46,7 +46,7 @@ vidmod_main() {
 		change="$( echo "$1" | tr '[:upper:]' '[:lower:]' )"
 
 		case "$change" in
-			169|43|60fps|audio|butter|crop219|crossfade|loop|mono|mp4|mute|reverse|rotate90|rotate180|rotate270|slowdown|twitter)
+			169|43|60fps|audio|butter|crop219|crossfade|loop|mono|mp4|mute|qt|reverse|rotate90|rotate180|rotate270|slowdown|twitter)
 				output="$( _add_tag "$input" "$change" )"
 				[ "$input" = "$output" ] && return
 				[ -z "$final" ] && echo "=> $output" || echo "=> $change"
