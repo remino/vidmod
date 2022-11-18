@@ -2,7 +2,7 @@
 # vidmod
 # Do rapid changes to video files using ffmpeg or other tools.
 
-VERSION='1.0.3'
+VERSION='1.1.0'
 
 vidmod_main() {
 	scriptpath="$( realpath "$0" )"
@@ -81,7 +81,7 @@ Do rapid changes to video files using ffmpeg or other tools.
 CHANGES:
 
 	169, 43, 60fps, audio, butter, crop219, crossfade, loop, mono, mp4, mute,
-	reverse, rotate90, rotate180, rotate270, slowdown, twitter
+	qt, reverse, rotate90, rotate180, rotate270, slowdown, twitter
 
 OPTIONS:
 
@@ -140,6 +140,16 @@ vidmod_loop() {
 		-c copy "$output"
 
 	rm "$tmpfile"
+}
+
+vidmod_qt() {
+	# shellcheck disable=SC2086
+	ffmpeg \
+		-i "$input" \
+		-tag:v hvc1 -c:v copy -c:a copy -c:s mov_text \
+		$ffmpeg_opts \
+		"$output" \
+	;
 }
 
 vidmod_mono() {
@@ -206,7 +216,7 @@ _add_tag() {
 	inext="$( echo "$inname" | grep -o '\..*$' )"
 
 	case "$tag" in
-		mp4) echo "$outputdir/$innoext.mp4" ;;
+		mp4|qt) echo "$outputdir/$innoext.mp4" ;;
 		*) echo "$outputdir/$innoext-$tag$inext" ;;
 	esac
 }
