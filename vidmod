@@ -212,8 +212,8 @@ _add_tag() {
 
 	inname="$( basename "$inpath" )"
 
-	innoext="$( echo "$inname" | sed 's/\..*$//g' )"
-	inext="$( echo "$inname" | grep -o '\..*$' )"
+	innoext="$( echo "$inname" | sed 's/\.[^.]*$//g' )"
+	inext="$( echo "$inname" | grep -o '\.[^.]*$' )"
 
 	case "$tag" in
 		mp4|qt) echo "$outputdir/$innoext.mp4" ;;
