@@ -158,8 +158,8 @@ vidmod_mute() {
 }
 
 vidmod_reverse() {
-	ffmpeg -i "$input" """$ffmpeg_op"t"s" \
-		-vf reverse -af areverse "$output"
+	# shellcheck disable=SC2086
+	ffmpeg -i "$input" $ffmpeg_opts -vf reverse -af areverse "$output"
 }
 
 vidmod_rotate90() {
