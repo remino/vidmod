@@ -146,7 +146,7 @@ vidmod_qt() {
 	# shellcheck disable=SC2086
 	ffmpeg \
 		-i "$input" \
-		-tag:v hvc1 -c:v copy -c:a copy -c:s mov_text \
+		-tag:v hvc1 -c copy -c:s mov_text \
 		$ffmpeg_opts \
 		"$output" \
 	;
