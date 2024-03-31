@@ -2,7 +2,7 @@
 # vidmod
 # Do rapid changes to video files using ffmpeg or other tools.
 
-VERSION='1.1.0'
+VERSION='1.2.0'
 
 vidmod_main() {
 	scriptpath="$( realpath "$0" )"
