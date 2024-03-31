@@ -46,7 +46,7 @@ vidmod_main() {
 		change="$( echo "$1" | tr '[:upper:]' '[:lower:]' )"
 
 		case "$change" in
-			169|43|60fps|audio|butter|crop219|crossfade|loop|mono|mp4|mute|qt|reverse|rotate90|rotate180|rotate270|slowdown|twitter)
+			169|43|60fps|audio|butter|crop219|crossfade|hevc|loop|mono|mp4|mute|qt|reverse|rotate90|rotate180|rotate270|slowdown|twitter)
 				output="$( _add_tag "$input" "$change" )"
 				[ "$input" = "$output" ] && return
 				[ -z "$final" ] && echo "=> $output" || echo "=> $change"
@@ -80,8 +80,8 @@ Do rapid changes to video files using ffmpeg or other tools.
 
 CHANGES:
 
-	169, 43, 60fps, audio, butter, crop219, crossfade, loop, mono, mp4, mute,
-	qt, reverse, rotate90, rotate180, rotate270, slowdown, twitter
+	169, 43, 60fps, audio, butter, crop219, crossfade, hevc, loop, mono, mp4,
+	mute, qt, reverse, rotate90, rotate180, rotate270, slowdown, twitter
 
 OPTIONS:
 
@@ -125,6 +125,11 @@ vidmod_crop219() {
 
 vidmod_crossfade() {
 	vidcrossfade -f 2 -o "$output" "$input"
+}
+
+vidmod_hevc() {
+	# shellcheck disable=SC2086
+	ffmpeg -y -i "$input" -c:v libx265 -c:a aac -tag:v hvc1 $ffmpeg_opts "$output"
 }
 
 vidmod_loop() {
@@ -216,7 +221,7 @@ _add_tag() {
 	inext="$( echo "$inname" | grep -o '\.[^.]*$' )"
 
 	case "$tag" in
-		mp4|qt) echo "$outputdir/$innoext.mp4" ;;
+		hevc|mp4|qt) echo "$outputdir/$innoext.mp4" ;;
 		*) echo "$outputdir/$innoext-$tag$inext" ;;
 	esac
 }
