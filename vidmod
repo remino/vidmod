@@ -5,64 +5,60 @@
 VERSION='1.2.0'
 
 vidmod_main() {
-	scriptpath="$( realpath "$0" )"
-	scriptname="$( basename "$scriptpath" )"
+	scriptpath="$(realpath "$0")"
+	scriptname="$(basename "$scriptpath")"
 
 	e_args=16
 
-	while getopts 'd:f:ho:v' OPTION
-	do
+	while getopts 'd:f:ho:v' OPTION; do
 		case "$OPTION" in
-			d) outputdir="$OPTARG" ;;
-			f) ffmpeg_extra_opts="$OPTARG" ;;
-			o) final="$OPTARG" ;;
-			h) vidmod_help && return ;;
-			v) vidmod_version && return ;;
-			*) vidmod_help && return $e_args ;;
+		d) outputdir="$OPTARG" ;;
+		f) ffmpeg_extra_opts="$OPTARG" ;;
+		o) final="$OPTARG" ;;
+		h) vidmod_help && return ;;
+		v) vidmod_version && return ;;
+		*) vidmod_help && return $e_args ;;
 		esac
 	done
 
-	[ $# -gt 0 ] && shift "$(( OPTIND - 1 ))"
+	[ $# -gt 0 ] && shift "$((OPTIND - 1))"
 
 	[ $# -lt 2 ] && "${scriptname}_help" && return 1
 
 	for input; do true; done
 
-	[ -z "$outputdir" ] && outputdir="$( dirname "$input" )"
-	[ -n "$final" ] && outputdir="$( mktemp -dt ".$scriptname" )"
+	[ -z "$outputdir" ] && outputdir="$(dirname "$input")"
+	[ -n "$final" ] && outputdir="$(mktemp -dt ".$scriptname")"
 
 	ffmpeg_opts="-hide_banner -loglevel panic -nostdin $ffmpeg_extra_opts"
 
-	if [ ! -f "$input" ]
-	then
+	if [ ! -f "$input" ]; then
 		_error "File not found: $input"
 		return 2
 	fi
 
 	echo "<= $input"
 
-	while [ $# -gt 1 ]
-	do
-		change="$( echo "$1" | tr '[:upper:]' '[:lower:]' )"
+	while [ $# -gt 1 ]; do
+		change="$(echo "$1" | tr '[:upper:]' '[:lower:]')"
 
 		case "$change" in
-			169|43|60fps|audio|butter|crop219|crossfade|hevc|loop|mono|mp4|mute|qt|reverse|rotate90|rotate180|rotate270|slowdown|twitter)
-				output="$( _add_tag "$input" "$change" )"
-				[ "$input" = "$output" ] && return
-				[ -z "$final" ] && echo "=> $output" || echo "=> $change"
-				"${scriptname}_${change}" > /dev/null 2>&1
-				result=$?
-				[ $result -gt 0 ] && return 3
-				input="$output"
-				;;
+		169 | 43 | 60fps | audio | butter | crop219 | crossfade | hevc | loop | mono | mp4 | mute | qt | reverse | rotate90 | rotate180 | rotate270 | slowdown | twitter)
+			output="$(_add_tag "$input" "$change")"
+			[ "$input" = "$output" ] && return
+			[ -z "$final" ] && echo "=> $output" || echo "=> $change"
+			"${scriptname}_${change}" >/dev/null 2>&1
+			result=$?
+			[ $result -gt 0 ] && return 3
+			input="$output"
+			;;
 
-			*) return 4 ;;
+		*) return 4 ;;
 		esac
 
 		shift
 
-		if [ $# -lt 2 ] && [ -n "$final" ]
-		then
+		if [ $# -lt 2 ] && [ -n "$final" ]; then
 			mv "$output" "$final"
 			echo "=> $final"
 			rm -fr "$outputdir"
@@ -71,7 +67,7 @@ vidmod_main() {
 }
 
 vidmod_help() {
-cat << USAGE
+	cat <<USAGE
 $scriptname $VERSION
 
 USAGE: $scriptname [<options>] <change1> [<changen>...] <input>
@@ -133,11 +129,10 @@ vidmod_hevc() {
 }
 
 vidmod_loop() {
-	tmpfile="$( mktemp ".$scriptname.XXXXXX" )"
+	tmpfile="$(mktemp ".$scriptname.XXXXXX")"
 
-	for _ in 1 2
-	do
-		echo "file '$input'" >> "$tmpfile"
+	for _ in 1 2; do
+		echo "file '$input'" >>"$tmpfile"
 	done
 
 	# shellcheck disable=SC2086
@@ -154,7 +149,7 @@ vidmod_qt() {
 		-tag:v hvc1 -c copy -c:s mov_text \
 		$ffmpeg_opts \
 		"$output" \
-	;
+		;
 }
 
 vidmod_mono() {
@@ -215,14 +210,14 @@ _add_tag() {
 	inpath="$1"
 	tag="$2"
 
-	inname="$( basename "$inpath" )"
+	inname="$(basename "$inpath")"
 
-	innoext="$( echo "$inname" | sed 's/\.[^.]*$//g' )"
-	inext="$( echo "$inname" | grep -o '\.[^.]*$' )"
+	innoext="$(echo "$inname" | sed 's/\.[^.]*$//g')"
+	inext="$(echo "$inname" | grep -o '\.[^.]*$')"
 
 	case "$tag" in
-		hevc|mp4|qt) echo "$outputdir/$innoext.mp4" ;;
-		*) echo "$outputdir/$innoext-$tag$inext" ;;
+	hevc | mp4 | qt) echo "$outputdir/$innoext.mp4" ;;
+	*) echo "$outputdir/$innoext-$tag$inext" ;;
 	esac
 }
 
