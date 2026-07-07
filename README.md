@@ -1,5 +1,10 @@
-vidmod
-======
+**2026-07-07 Update**: _vidmod_ was rewritten and released as
+[**vidmod v2**](https://github.com/remino/remutils/tree/main/vidmod) in
+[remutils](https://github.com/remino/remutils).
+
+---
+
+# vidmod
 
 ```
 vidmod 1.1.0
